@@ -1,6 +1,6 @@
 # Restful-booker-api-postman
 
-
+![](https://github.com/magentaverse/Restful-booker-api-postman/blob/2b5cc34083d779c8f036b026d270605a35962d51/Postman-restful-booker.gif?raw=true)
 ![](https://img.shields.io/badge/Tools-Postman-informational?style=flat&logo=postman&logoColor=white&color=blueviolet)
 
 
