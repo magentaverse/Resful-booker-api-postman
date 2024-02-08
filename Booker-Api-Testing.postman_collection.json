@@ -1,0 +1,660 @@
+{
+	"info": {
+		"_postman_id": "e0b2cb99-a0e8-44f1-8f7b-e141b1c132e8",
+		"name": "Booker-Api-Testing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32422409"
+	},
+	"item": [
+		{
+			"name": "Create-Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var tokenValue = pm.response.json().token;",
+							"",
+							"// Zapisz token w zmiennej globalnej",
+							"pm.globals.set(\"accessToken\", tokenValue);",
+							"",
+							"pm.sendRequest({",
+							"    url: 'https://restful-booker.herokuapp.com/auth',",
+							"    method: 'POST',",
+							"    header: {",
+							"        'Content-Type': 'application/json'",
+							"    },",
+							"    body: {",
+							"        mode: 'raw',",
+							"        raw: JSON.stringify({",
+							"            \"username\": \"your_username\",",
+							"            \"password\": \"your_password\"",
+							"        })",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\" : \"admin\",\n    \"password\" : \"password123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://restful-booker.herokuapp.com/auth",
+					"protocol": "https",
+					"host": [
+						"restful-booker",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"auth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create-New-Booking",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Przyjmując, że 'bookingid' to nazwa klucza, w którym znajduje się bookingid w odpowiedzi",
+							"var bookingIdValue = pm.response.json().bookingid; ",
+							"",
+							"// Zapisz bookingid w zmiennej globalnej",
+							"pm.globals.set(\"globalBookingId\", bookingIdValue);",
+							"",
+							"// Test sprawdzający, czy status odpowiedzi to 200 OK",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Test ustawiający globalną zmienną 'globalBookingId' na wartość 'bookingid' z odpowiedzi",
+							"pm.test(\"Set globalBookingId\", function() {",
+							"    const responseBody = pm.response.json();",
+							"    pm.globals.set(\"globalBookingId\", responseBody.bookingid);",
+							"});",
+							"",
+							"// Test sprawdzający, czy nagłówek 'Content-Type' jest obecny w odpowiedzi",
+							"pm.test(\"Header Content-Type is present\", function () {",
+							"    pm.response.to.have.header('Content-Type');",
+							"});",
+							"",
+							"// Test sprawdzający, czy odpowiedź jest w formacie JSON",
+							"pm.test(\"Response is a JSON\", function () {",
+							"    pm.response.to.have.jsonBody();",
+							"});",
+							"",
+							"// Test sprawdzający, czy wartości JSON mają poprawne typy",
+							"pm.test(\"JSON values are correct types\", function () {",
+							"    var response = pm.response.json().booking; // Added missing variable declaration",
+							"    pm.expect(typeof(response.firstname)).to.eql('string');",
+							"\tpm.expect(typeof(response.lastname)).to.eql('string');",
+							"\tpm.expect(typeof(response.totalprice)).to.eql('number');",
+							"\tpm.expect(typeof(response.depositpaid)).to.eql('boolean');",
+							"\tpm.expect(typeof(response.bookingdates.checkin)).to.eql('string');",
+							"\tpm.expect(typeof(response.bookingdates.checkout)).to.eql('string');",
+							"\tpm.expect(typeof(response.additionalneeds)).to.eql('string');",
+							"\t",
+							"});",
+							"",
+							"// Test sprawdzający, czy pole \"firstname\" nie jest null",
+							"pm.test(\"Imię nie jest null\", function () {",
+							"    const responseBody = pm.response.json();",
+							"",
+							"    // Sprawdź, czy pole \"firstname\" nie jest null",
+							"    pm.expect(responseBody.firstname).to.not.equal(null);",
+							"});",
+							"",
+							"// Test sprawdzający, czy pole \"lastname\" nie jest null",
+							"pm.test(\"Nazwisko nie jest null\", function () {",
+							"    const responseBody = pm.response.json();",
+							"",
+							"    // Sprawdź, czy pole \"lastname\" nie jest null",
+							"    pm.expect(responseBody.lastname).to.not.equal(null);",
+							"});",
+							"",
+							"// Test sprawdzający, czy wartość 'totalprice' nie jest null",
+							"pm.test(\"Check if totalprice is not null\", function () {",
+							"    pm.expect(pm.response.json().booking.totalprice).to.not.equal(null); ",
+							"});",
+							"",
+							"// Test sprawdzający, czy pole \"depositpaid\" nie jest null",
+							"pm.test(\"Depositpaid is not null\", function () {",
+							"    const responseBody = pm.response.json();",
+							"    const depositPaid = responseBody.depositpaid;",
+							"",
+							"    // Sprawdź, czy depositpaid nie jest null",
+							"    pm.expect(depositPaid).to.not.equal(null);",
+							"});",
+							"",
+							"// Test sprawdzający, czy pole \"bookingdates\" nie jest null",
+							"pm.test(\"Data rezerwacji nie jest null\", function () {",
+							"    const responseBody = pm.response.json();",
+							"",
+							"    // Sprawdź, czy pole \"bookingdates\" nie jest null",
+							"    pm.expect(responseBody.bookingdates).to.not.equal(null);",
+							"});",
+							"",
+							"// Test sprawdzający, czy pole \"totalprice\" jest zaokrąglane do dwóch miejsc po przecinku lub jest liczbą całkowitą i nie jest wartością ujemną",
+							"pm.test(\"Total price is rounded to two decimal places or is an integer and is not a negative value\", function () {",
+							"    const responseBody = pm.response.json().booking;",
+							"    ",
+							"    // Sprawdź, czy totalprice jest liczbą całkowitą",
+							"    const isInteger = Number.isInteger(responseBody.totalprice);",
+							"",
+							"    // Sprawdź, czy totalprice jest zaokrąglane do dwóch miejsc po przecinku",
+							"    const isRounded = responseBody.totalprice % 0.01 === 0;",
+							"",
+							"    // Sprawdź, czy totalprice nie jest wartością ujemną",
+							"    const isNotNegative = responseBody.totalprice >= 0;",
+							"",
+							"    // Sprawdź, czy przynajmniej jedno z powyższych warunków jest spełnione",
+							"    pm.expect(isInteger || isRounded).to.eql(true);",
+							"",
+							"    // Sprawdź, czy totalprice nie jest wartością ujemną",
+							"    pm.expect(isNotNegative).to.eql(true);",
+							"});",
+							"",
+							"",
+							"// Test sprawdzający, czy pole \"firstname\" nie zawiera cyfr ani znaków specjalnych",
+							"pm.test(\"First name does not contain digits or special characters\", function () {",
+							"    const responseBody = pm.response.json();",
+							"    const firstName = responseBody.firstname;",
+							"",
+							"    // Sprawdź, czy firstname nie zawiera cyfr",
+							"    pm.expect(/[0-9]/.test(firstName)).to.eql(false);",
+							"",
+							"    // Sprawdź, czy firstname nie zawiera znaków specjalnych",
+							"    pm.expect(/[^a-zA-Z]/.test(firstName)).to.eql(false);",
+							"});",
+							"",
+							"// Test sprawdzający, czy pole \"lastname\" nie zawiera cyfr ani znaków specjalnych",
+							"pm.test(\"Last name does not contain digits or special characters\", function () {",
+							"    const responseBody = pm.response.json();",
+							"    const lastName = responseBody.lastname;",
+							"",
+							"    // Sprawdź, czy lastname nie zawiera cyfr",
+							"    pm.expect(/[0-9]/.test(lastName)).to.eql(false);",
+							"",
+							"    // Sprawdź, czy lastname nie zawiera znaków specjalnych",
+							"    pm.expect(/[^a-zA-Z]/.test(lastName)).to.eql(false);",
+							"});",
+							"",
+							"// Test sprawdzający, czy data zamledowania nie jest późniejsza niż data wymeldowania",
+							"pm.test(\"Checkin date is not later than checkout date\", function () {",
+							"    const responseBody = pm.response.json();",
+							"",
+							"    // Sprawdź, czy obiekt \"booking\" jest obecny w odpowiedzi",
+							"    pm.expect(responseBody).to.have.property('booking');",
+							"",
+							"    // Sprawdź, czy obiekt \"bookingdates\" jest obecny w obiekcie \"booking\"",
+							"    pm.expect(responseBody.booking).to.have.property('bookingdates');",
+							"",
+							"    // Sprawdź, czy właściwości \"checkin\" i \"checkout\" są obecne w obiekcie \"bookingdates\"",
+							"    pm.expect(responseBody.booking.bookingdates).to.have.property('checkin');",
+							"    pm.expect(responseBody.booking.bookingdates).to.have.property('checkout');",
+							"",
+							"    const checkinDate = new Date(responseBody.booking.bookingdates.checkin);",
+							"    const checkoutDate = new Date(responseBody.booking.bookingdates.checkout);",
+							"",
+							"    // Sprawdź, czy data \"checkin\" nie jest późniejsza niż data \"checkout\"",
+							"    pm.expect(checkinDate.getTime()).to.be.at.most(checkoutDate.getTime());",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstname\" : \"Jim\",\n    \"lastname\" : \"Brown\",\n    \"totalprice\" : 111,\n    \"depositpaid\" : true,\n    \"bookingdates\" : {\n        \"checkin\" : \"2018-01-01\",\n        \"checkout\" : \"2019-01-01\"\n    },\n    \"additionalneeds\" : \"Breakfast\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://restful-booker.herokuapp.com/booking",
+					"protocol": "https",
+					"host": [
+						"restful-booker",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"booking"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get-Booking-by-ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test sprawdzający, czy status odpowiedzi to 200 OK",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Test sprawdzający, czy odpowiedź zawiera oczekiwane dane rezerwacji",
+							"pm.test(\"Response contains correct booking data\", function () {",
+							"    const responseBody = pm.response.json();",
+							"    });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://restful-booker.herokuapp.com/booking/{{globalBookingId}}",
+					"protocol": "https",
+					"host": [
+						"restful-booker",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"booking",
+						"{{globalBookingId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get-Booking-Ids",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test sprawdzający, czy status odpowiedzi to 200 OK",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Test sprawdzający, czy odpowiedź zawiera zbiór identyfikatorów rezerwacji",
+							"pm.test(\"Response contains an array of bookingIds\", function () {",
+							"    const responseBody = pm.response.json();",
+							"    pm.expect(responseBody).to.be.an('array').that.is.not.empty;",
+							"    pm.expect(responseBody[0]).to.have.property('bookingid');",
+							"});",
+							"",
+							"// Pobierz listę id rezerwacji z odpowiedzi",
+							"const bookingIds = pm.response.json().map(booking => booking.bookingid);",
+							"",
+							"// Test sprawdzający, czy id rezerwacji nie powtarzają się",
+							"pm.test(\"Booking IDs are unique\", function () {",
+							"    const uniqueIds = new Set(bookingIds);",
+							"",
+							"    // Sprawdź, czy ilość unikalnych id jest równa całkowitej liczbie id",
+							"    pm.expect(uniqueIds.size).to.eql(bookingIds.length);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://restful-booker.herokuapp.com/booking",
+					"protocol": "https",
+					"host": [
+						"restful-booker",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"booking"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update-Booking",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Inicjalizacja zmiennych środowiskowych do śledzenia poprzednich danych",
+							"const previousCheckinDate = new Date(pm.environment.get('previousCheckinDate'));",
+							"const previousFirstName = pm.environment.get('previousFirstName');",
+							"const previousLastName = pm.environment.get('previousLastName');",
+							"",
+							"// Test sprawdzający, czy status odpowiedzi to 200 OK",
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Test sprawdzający, czy imię zostało zaktualizowane",
+							"pm.test('firstname is updated', function () {",
+							"    const responseBody = pm.response.json();",
+							"    const updatedFirstName = responseBody.firstname;",
+							"    pm.expect(updatedFirstName).to.not.eql(previousFirstName);",
+							"    pm.environment.set('previousFirstName', responseBody.firstname);",
+							"});",
+							"",
+							"// Test sprawdzający, czy nazwisko zostało zaktualizowane",
+							"pm.test('LastName is updated', function () {",
+							"    const responseBody = pm.response.json();",
+							"    const updatedLastName = responseBody.lastname;",
+							"    pm.expect(updatedLastName).to.not.eql(previousLastName);",
+							"    pm.environment.set('previousLastName', responseBody.lastname);",
+							"});",
+							"",
+							"// Test sprawdzający, czy data zameldowania została zaktualizowana",
+							"pm.test('Check-in date is updated', function () {",
+							"    const responseBody = pm.response.json();",
+							"    const updatedCheckinDate = new Date(responseBody.bookingdates.checkin);",
+							"    pm.expect(updatedCheckinDate.getTime()).to.not.eql(previousCheckinDate.getTime());",
+							"});",
+							"",
+							"// Test sprawdzający, czy data wymeldowania została zaktualizowana",
+							"pm.test('Check-out date is updated', function () {",
+							"    const responseBody = pm.response.json();",
+							"    const previousCheckoutDate = new Date(pm.environment.get('previousCheckoutDate'));",
+							"    const updatedCheckoutDate = new Date(responseBody.bookingdates.checkout);",
+							"    pm.expect(updatedCheckoutDate.getTime()).to.not.eql(previousCheckoutDate.getTime());",
+							"});",
+							"",
+							"// Zaktualizuj zmienną updatedAdditionalNeeds na podstawie odpowiedzi serwera",
+							"pm.environment.set('updatedAdditionalNeeds', pm.response.json().additionalneeds);",
+							"",
+							"// Test sprawdzający, czy dodatkowe potrzeby zostały zaktualizowane",
+							"pm.test(\"Additional needs are updated\", function () {",
+							"    const responseBody = pm.response.json();",
+							"    pm.expect(responseBody.additionalneeds).to.eql(pm.environment.get('updatedAdditionalNeeds'));",
+							"});",
+							"",
+							"// Pobierz zmienną \"previousTotalPrice\" z globalnych zmiennych",
+							"const previousTotalPrice = pm.globals.get('previousTotalPrice');",
+							"",
+							"// Pobierz \"totalprice\" z odpowiedzi",
+							"const updatedTotalPrice = pm.response.json().totalprice;",
+							"",
+							"// Test sprawdzający, czy \"totalprice\" została zaktualizowane",
+							"pm.test(\"Total price is updated\", function () {",
+							"    // Sprawdź, czy \"totalprice\" nie jest równa wartości wcześniej zapisanej",
+							"    pm.expect(updatedTotalPrice).to.not.eql(previousTotalPrice);",
+							"",
+							"    // Zaktualizuj zmienną \"previousTotalPrice\" na nową wartość \"totalprice\"",
+							"    pm.globals.set('previousTotalPrice', updatedTotalPrice);",
+							"});",
+							"",
+							"// Test sprawdzający, czy wpłacono depozyt",
+							"pm.test(\"Deposit is paid\", function () {",
+							"    const responseBody = pm.response.json();",
+							"",
+							"    // Sprawdź, czy pole \"depositpaid\" jest ustawione na true",
+							"    pm.expect(responseBody.depositpaid).to.eql(true);",
+							"});",
+							"",
+							"// Ustaw zmienną randomFirstName",
+							"pm.variables.set(\"randomFirstName\", \"Joanna\");",
+							"",
+							"// Pobierz wartość zmiennej randomFirstName",
+							"const expectedFirstName = pm.variables.get(\"randomFirstName\");",
+							"",
+							"// Test sprawdzający, czy pole \"firstname\" zostało zaktualizowane na oczekiwaną wartość",
+							"pm.test(\"First name is updated to expected value\", function () {",
+							"    const responseBody = pm.response.json();",
+							"",
+							"    // Sprawdź, czy pole \"firstname\" jest zaktualizowane na oczekiwaną wartość",
+							"    pm.expect(responseBody.firstname).to.eql(expectedFirstName);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Cookie",
+						"value": "token={{accessToken}}",
+						"type": "text"
+					},
+					{
+						"key": "Booking-ID",
+						"value": "{{globalBookingId}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstname\" : \"Joanna\",\n    \"lastname\" : \"Borowska\",\n    \"totalprice\" : 122,\n    \"depositpaid\" : true,\n    \"bookingdates\" : {\n        \"checkin\" : \"2018-01-01\",\n        \"checkout\" : \"2019-01-01\"\n    },\n    \"additionalneeds\" : \"Breakfast\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://restful-booker.herokuapp.com/booking/1",
+					"protocol": "https",
+					"host": [
+						"restful-booker",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"booking",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Partial-Update",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Inicjalizacja zmiennych środowiskowych do śledzenia poprzednich danych",
+							"const previousFirstName = pm.environment.get('previousFirstName');",
+							"const previousLastName = pm.environment.get('previousLastName');",
+							"",
+							"// Test sprawdzający, czy status odpowiedzi to 200 OK",
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Test sprawdzający, czy imię zostało zaktualizowane",
+							"pm.test('firstname is updated', function () {",
+							"    const responseBody = pm.response.json();",
+							"    const updatedFirstName = responseBody.firstname;",
+							"    pm.expect(updatedFirstName).to.not.eql(previousFirstName);",
+							"    pm.environment.set('previousFirstName', responseBody.firstname);",
+							"});",
+							"",
+							"// Test sprawdzający, czy nazwisko zostało zaktualizowane",
+							"pm.test('LastName is updated', function () {",
+							"    const responseBody = pm.response.json();",
+							"    const updatedLastName = responseBody.lastname;",
+							"    pm.expect(updatedLastName).to.not.eql(previousLastName);",
+							"    pm.environment.set('previousLastName', responseBody.lastname);",
+							"});",
+							"",
+							"// Ustaw zmienną randomFirstName",
+							"pm.variables.set(\"randomFirstName\", \"James\");",
+							"",
+							"// Pobierz wartość zmiennej randomFirstName",
+							"const expectedFirstName = pm.variables.get(\"randomFirstName\");",
+							"",
+							"// Test sprawdzający, czy pole \"firstname\" zostało zaktualizowane na oczekiwaną wartość",
+							"pm.test(\"First name is updated to expected value\", function () {",
+							"    const responseBody = pm.response.json();",
+							"",
+							"    // Sprawdź, czy pole \"firstname\" jest zaktualizowane na oczekiwaną wartość",
+							"    pm.expect(responseBody.firstname).to.eql(expectedFirstName);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Cookie",
+						"value": "token={{accessToken}}",
+						"type": "text"
+					},
+					{
+						"key": "Booking-ID",
+						"value": "{{globalBookingId}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstname\" : \"James\",\n    \"lastname\" : \"Brown\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://restful-booker.herokuapp.com/booking/1",
+					"protocol": "https",
+					"host": [
+						"restful-booker",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"booking",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete-Booking",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test sprawdzający, czy status odpowiedzi to 200 OK",
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"// Test czy rezerwacja została usunieta z bazy danych",
+							"pm.test(\"Booking is no longer present in the database\", function () {",
+							"    const deletedBookingId = pm.globals.get('deletedBookingId');   ",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Cookie",
+						"value": "\ttoken={{accessToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://restful-booker.herokuapp.com/booking/{{globalBookingId}}",
+					"protocol": "https",
+					"host": [
+						"restful-booker",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"booking",
+						"{{globalBookingId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
